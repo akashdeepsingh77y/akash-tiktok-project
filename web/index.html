@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Akash TikTok Project</title>
+  <link rel="icon" href="/favicon.svg" />
+  <link rel="stylesheet" href="./styles.css"/>
+  <meta name="description" content="A mini TikTok-like uploader and gallery with Azure Blob Storage + Azure Functions."/>
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img src="./favicon.svg" alt="" class="logo"/>
+      <div>
+        <h1>Akash TikTok Project</h1>
+        <p class="tagline">Upload. Watch. Share — scalable on Azure.</p>
+      </div>
+    </div>
+    <nav class="actions">
+      <button id="refreshBtn" class="btn ghost">Refresh</button>
+      <a href="https://github.com/new" target="_blank" rel="noreferrer" class="btn">Create GitHub Repo</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="uploader">
+      <div id="dropzone" class="dropzone" tabindex="0" aria-label="Upload area">
+        <input type="file" id="fileInput" accept="video/*" multiple style="display:none"/>
+        <div class="dz-inner">
+          <div class="dz-icon">⬆</div>
+          <h2>Drag & drop videos here</h2>
+          <p>…or</p>
+          <button id="browseBtn" class="btn primary">Choose files</button>
+          <p class="hint">Accepted: MP4, WEBM, MOV, MKV</p>
+        </div>
+      </div>
+      <div id="queue" class="queue" aria-live="polite"></div>
+    </section>
+
+    <section class="toolbar">
+      <input id="search" class="search" placeholder="Search videos by name…" />
+      <span id="count" class="count">0 videos</span>
+    </section>
+
+    <section id="gallery" class="gallery" aria-live="polite"></section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Built for the Scalable Advanced Software Solution assignment.
+      Frontend is intentionally different from earlier versions.
+    </p>
+  </footer>
+
+  <script src="./app.js" type="module"></script>
+</body>
+</html>

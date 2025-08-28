@@ -1,0 +1,14 @@
+{
+  "name": "akash-tiktok-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Azure Functions API for Akash TikTok Project (SAS + listing).",
+  "main": "index.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@azure/storage-blob": "^12.17.0"
+  }
+}
