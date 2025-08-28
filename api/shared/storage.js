@@ -24,7 +24,7 @@ function getSharedKeyCredential() {
   return { accountName, credential: new StorageSharedKeyCredential(accountName, accountKey) };
 }
 
-// 🔒 Hardcode the container we use. No env var needed.
+// always use this container
 function getContainerName() {
   return "videos";
 }
