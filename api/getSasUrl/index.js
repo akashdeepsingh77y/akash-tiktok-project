@@ -1,4 +1,11 @@
-const { generateBlobSASQueryParameters, BlobSASPermissions, getSharedKeyCredential, getContainerName, sanitizeBlobName } = require("../shared/storage");
+const {
+  generateBlobSASQueryParameters,
+  BlobSASPermissions,
+  getSharedKeyCredential,
+  getServiceClient,
+  getContainerName,
+  sanitizeBlobName
+} = require("../shared/storage");
 
 module.exports = async function (context, req) {
   try {
@@ -9,33 +16,46 @@ module.exports = async function (context, req) {
     const containerName = getContainerName();
     const blobName = `${Date.now()}_${sanitizeBlobName(filename)}`;
 
-    // Write SAS (for upload)
-    const writePerms = BlobSASPermissions.parse("cw"); // create + write
-    const writeSas = generateBlobSASQueryParameters({
-      containerName,
-      blobName,
-      permissions: writePerms,
-      startsOn: new Date(Date.now() - 2 * 60 * 1000), // 2 minutes clock skew
-      expiresOn: new Date(Date.now() + 60 * 60 * 1000) // 1 hour
-    }, credential).toString();
+    // Ensure the container exists (creates it if missing)
+    const service = getServiceClient();
+    const container = service.getContainerClient(containerName);
+    await container.createIfNotExists();
 
-    const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${encodeURIComponent(blobName)}?${writeSas}`;
+    // SAS for upload (create + write)
+    const writeSas = generateBlobSASQueryParameters(
+      {
+        containerName,
+        blobName,
+        permissions: BlobSASPermissions.parse("cw"),
+        startsOn: new Date(Date.now() - 2 * 60 * 1000),
+        expiresOn: new Date(Date.now() + 60 * 60 * 1000)
+      },
+      credential
+    ).toString();
 
-    // Read SAS for later/preview
-    const readPerms = BlobSASPermissions.parse("r");
-    const readSas = generateBlobSASQueryParameters({
-      containerName,
-      blobName,
-      permissions: readPerms,
-      startsOn: new Date(Date.now() - 2 * 60 * 1000),
-      expiresOn: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-    }, credential).toString();
+    const uploadUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${encodeURIComponent(
+      blobName
+    )}?${writeSas}`;
 
-    const readUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${encodeURIComponent(blobName)}?${readSas}`;
+    // SAS for preview (read)
+    const readSas = generateBlobSASQueryParameters(
+      {
+        containerName,
+        blobName,
+        permissions: BlobSASPermissions.parse("r"),
+        startsOn: new Date(Date.now() - 2 * 60 * 1000),
+        expiresOn: new Date(Date.now() + 24 * 60 * 60 * 1000)
+      },
+      credential
+    ).toString();
+
+    const previewUrl = `https://${accountName}.blob.core.windows.net/${containerName}/${encodeURIComponent(
+      blobName
+    )}?${readSas}`;
 
     context.res = {
       headers: { "Content-Type": "application/json" },
-      body: { uploadUrl, blobName, previewUrl: readUrl, contentType }
+      body: { uploadUrl, blobName, previewUrl, contentType }
     };
   } catch (err) {
     context.log.error(err);
