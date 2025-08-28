@@ -96,6 +96,7 @@ akash-tiktok-project/
   ```
 - In another terminal, serve `web/` with any static server (e.g., VS Code Live Server).
 - Update `local.settings.json` with your connection string (do **not** commit secrets).
+- 
 
 ---
 
