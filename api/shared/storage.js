@@ -1,4 +1,9 @@
-const { BlobServiceClient, StorageSharedKeyCredential, generateBlobSASQueryParameters, BlobSASPermissions } = require("@azure/storage-blob");
+const {
+  BlobServiceClient,
+  StorageSharedKeyCredential,
+  generateBlobSASQueryParameters,
+  BlobSASPermissions
+} = require("@azure/storage-blob");
 
 function parseConnectionString(connStr) {
   const map = {};
@@ -6,7 +11,9 @@ function parseConnectionString(connStr) {
     const [k, v] = part.split("=");
     if (k && v) map[k.trim()] = v.trim();
   }
-  if (!map.AccountName || !map.AccountKey) throw new Error("Invalid storage connection string; AccountName/AccountKey missing.");
+  if (!map.AccountName || !map.AccountKey) {
+    throw new Error("Invalid storage connection string; AccountName/AccountKey missing.");
+  }
   return { accountName: map.AccountName, accountKey: map.AccountKey };
 }
 
@@ -17,9 +24,9 @@ function getSharedKeyCredential() {
   return { accountName, credential: new StorageSharedKeyCredential(accountName, accountKey) };
 }
 
+// 🔒 Hardcode the container we use. No env var needed.
 function getContainerName() {
-  const name = process.env.CONTAINER_NAME || "videos";
-  return name;
+  return "videos";
 }
 
 function getServiceClient() {
@@ -29,7 +36,7 @@ function getServiceClient() {
 }
 
 function sanitizeBlobName(name) {
-  return name.replace(/[?#<>:\"\\\\/|*]/g, "_").replace(/\s+/g, "_");
+  return name.replace(/[?#<>:"\\\/|*]/g, "_").replace(/\s+/g, "_");
 }
 
 module.exports = {
